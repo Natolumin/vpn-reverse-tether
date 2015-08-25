@@ -52,7 +52,11 @@ This method leverages VpnService API and **does not require root access**.
 
 3. Build the host-side forwarder:
 
+For android SDK < r24.3.4
         make -C jni
+For android SDK >= r24.3.4
+        make -C jni ABSTRACT_SOCKET=1
+
 
 ### Eclipse
 
