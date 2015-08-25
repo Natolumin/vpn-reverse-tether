@@ -72,11 +72,21 @@ int get_local_tunnel(char* name) {
   int tunnel = socket(PF_LOCAL, SOCK_STREAM, 0);
 
   struct sockaddr_un addr = {};
+  int socksize;
   addr.sun_family = AF_LOCAL;
+
+#ifdef ABSTRACT_SOCKNAME
+  addr.sun_path[0] = '\0';
+  strncpy(addr.sun_path + 1, name, sizeof(addr.sun_path) - 1);
+  addr.sun_path[sizeof(addr.sun_path) - 1] = '\0';
+  socksize = sizeof(addr.sun_family) + strlen(addr.sun_path + 1) + 1;
+#else
   strncpy(addr.sun_path, name, sizeof(addr.sun_path));
   addr.sun_path[sizeof(addr.sun_path) - 1] = '\0';
+  socksize = sizeof(addr);
+#endif
 
-  if (connect(tunnel, (struct sockaddr*) &addr, sizeof(addr))) {
+  if (connect(tunnel, (struct sockaddr*) &addr, socksize)) {
     perror("Connect to tunnel");
     return -1;
   }
